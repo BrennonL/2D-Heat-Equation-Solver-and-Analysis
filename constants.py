@@ -1,0 +1,1 @@
+ALPHA = 3.352 # Steel, stainless 310 at 25 °C
