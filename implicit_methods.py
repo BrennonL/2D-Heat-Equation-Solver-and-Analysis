@@ -10,9 +10,6 @@ from scipy.optimize import (
 #   symbols,Eq,solve,I
 # )
 
-def FTCS():
-  ...
-
 def backward_Euler(
     h:float|int, # detla x and delta y
     delta_t:float|int,
