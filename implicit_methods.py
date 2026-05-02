@@ -1,6 +1,6 @@
 from typing import Callable
 from numpy import (
-  array,ndarray,sin,cos,zeros,fill_diagonal
+  array,ndarray,sin,cos,zeros,fill_diagonal,reshape
 )
 from numpy.linalg import solve
 from scipy.optimize import (
@@ -15,8 +15,9 @@ def backward_Euler(
     delta_t:float|int,
     t:float|int,
     c:float,
-    heat_map:array[float,float,float,float],
-    boundary_conditions:array[float,float,float,float]
+    initial_x:ndarray,
+    heat_map:tuple[float,float,float,float],
+    boundary_conditions:tuple[float,float,float,float]
 ):
   """
   The Backward Euler algorithm for 2D heatmap
@@ -35,46 +36,53 @@ def backward_Euler(
   ny = int((y_max - y_min) / h -1)
   N = nx * ny
 
-  initial_x:ndarray = zeros(int(N+1))
-  # TODO -- Implement boundary conditions
-  initial_x[0] = ...
+  # initial_x:ndarray = zeros(int(N))
+  # initial_x[int(len(initial_x)/2)] = 100 
+  # initial_x:ndarray = zeros(x_max, y_max)
+
 
   # Create sparce matrix or coefficient matrix
-  A:ndarray = zeros((int(N+1),int(N+1)))
-  b:ndarray = zeros(int(N+1))
-  fill_diagonal(A, (1 + 2*Lambda + 2*Lambda))
-  for i in range(len(A)): # rows
-    for j in range(len(A[i])): # columns
-      if A[i][j] == 1 + 2*Lambda:
-        if j>0: # Left
-          A[i][j-1] = - Lambda
-          b[i] += Tl
-        if j<(len(A[i]) - 1): # right
-          A[i][j+1] = - Lambda
-          b[i] += Tr
-        if j-nx>0: # bottom
-          A[i][j-nx] = - Lambda
-          b[i] += Tb
-        if j+nx<(len(A[i])-1): # top
-          A[i][j+nx] = - Lambda
-          b[i] += Tt
+  A:ndarray = zeros((int(N),int(N)))
+  b:ndarray = zeros(int(N))
+  for i in range(ny): # rows
+    for j in range(nx): # columns
+      k = j + i * nx
+      A[k,k] = 1 + 2*Lambda + 2*Lambda
+
+      if j>0: # Left
+        A[k,k-1] = - Lambda
+        b[k] += Lambda*Tl
+
+      if j<nx-1: # right
+        A[k,k+1] = - Lambda
+        b[k] += Lambda*Tr
+
+      if i >0: # bottom
+        A[k,k-nx] = - Lambda
+        b[k] += Lambda*Tb
+
+      if i<ny-1: # top
+        A[k,k+nx] = - Lambda
+        b[k] += Lambda*Tt
 
   # Run simulation
   n = t / delta_t # Number of time steps
   curr_x = initial_x
   for k in range(int(n)):
-    next_x = solve(A, b)
-    next_x[0] = 100
+    b_new = curr_x + b
+    next_x = solve(A, b_new)
     curr_x = next_x
-  return curr_x
+  curr_x = reshape(curr_x,(nx,ny), order="F")
+  return curr_x 
 
 def crank_nicolson(
     h:float, # detla x and delta y
     delta_t,
     t,
     c:float,
-    heat_map:array[float,float,float,float],
-    boundary_conditions:array[float,float,float,float]
+    initial_x:ndarray,
+    heat_map:tuple[float,float,float,float],
+    boundary_conditions:tuple[float,float,float,float]
 )->ndarray:
   """
   The Crank Nicolson algorithm for 2D heatmap
@@ -93,13 +101,11 @@ def crank_nicolson(
   ny = int((y_max - y_min) / h -1)
   N = nx * ny
 
-  initial_x:ndarray = zeros(int(N+1))
-  # TODO -- Implement boundary conditions
-  initial_x[0] = ...
-
+  # initial_x:ndarray = zeros(int(N))
+  # initial_x[int(len(initial_x)/2)] = 100
   # Create sparce matrix or coefficient matrix
-  A:ndarray = zeros((int(N+1),int(N+1)))
-  b:ndarray = zeros(int(N+1))
+  A:ndarray = zeros((int(N),int(N)))
+  b:ndarray = zeros(int(N))
   fill_diagonal(A, (1 + 2*Lambda))
   for i in range(len(A)): # rows
     for j in range(len(A[i])): # columns
@@ -121,7 +127,8 @@ def crank_nicolson(
   n = t / delta_t # Number of time steps
   curr_x = initial_x
   for k in range(int(n)):
+    b_new = curr_x + b
     next_x = solve(A, b)
-    next_x[0] = 100
     curr_x = next_x
+  curr_x = reshape(curr_x,(nx,ny))
   return curr_x
