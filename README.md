@@ -42,13 +42,9 @@ The project includes:
 The FTCS (Forward-Time Central-Space) scheme is given by:
 
 $$
-T_{i,j}^{n+1}
-=
-T_{i,j}^{n}
-+
-r_x \left(T_{i+1,j}^{n} - 2T_{i,j}^{n} + T_{i-1,j}^{n}\right)
-+
-r_y \left(T_{i,j+1}^{n} - 2T_{i,j}^{n} + T_{i,j-1}^{n}\right)
+T_{i,j}^{n+1} = T_{i,j}^{n}
++ r_x \left(T_{i+1,j}^{n} - 2T_{i,j}^{n} + T_{i-1,j}^{n}\right)
++ r_y \left(T_{i,j+1}^{n} - 2T_{i,j}^{n} + T_{i,j-1}^{n}\right)
 $$
 
 where:
@@ -71,13 +67,9 @@ $$
 The Backward Euler method uses a fully implicit time discretization:
 
 $$
-T_{i,j}^{n+1}
-=
-T_{i,j}^{n}
-+
-r_x \left(T_{i+1,j}^{n+1} - 2T_{i,j}^{n+1} + T_{i-1,j}^{n+1}\right)
-+
-r_y \left(T_{i,j+1}^{n+1} - 2T_{i,j}^{n+1} + T_{i,j-1}^{n+1}\right)
+T_{i,j}^{n+1} = T_{i,j}^{n}
++ r_x \left(T_{i+1,j}^{n+1} - 2T_{i,j}^{n+1} + T_{i-1,j}^{n+1}\right)
++ r_y \left(T_{i,j+1}^{n+1} - 2T_{i,j}^{n+1} + T_{i,j-1}^{n+1}\right)
 $$
 
 This can be written in matrix form as:
@@ -98,27 +90,22 @@ where \(A\) is a coefficient matrix and \(\mathbf{b}\) contains boundary contrib
 The Crank–Nicolson method averages FTCS and Backward Euler:
 
 $$
-T_{i,j}^{n+1}
-=
-T_{i,j}^{n}
+T_{i,j}^{n+1} = T_{i,j}^{n}
++ \frac{r_x}{2}\left[
+\left(T_{i+1,j}^{n} - 2T_{i,j}^{n} + T_{i-1,j}^{n}\right)
 +
-\frac{r_x}{2}
-\left[
-(T_{i+1,j}^{n} - 2T_{i,j}^{n} + T_{i-1,j}^{n})
-+
-(T_{i+1,j}^{n+1} - 2T_{i,j}^{n+1} + T_{i-1,j}^{n+1})
+\left(T_{i+1,j}^{n+1} - 2T_{i,j}^{n+1} + T_{i-1,j}^{n+1}\right)
 \right]
 $$
 
 $$
++ \frac{r_y}{2}\left[
+\left(T_{i,j+1}^{n} - 2T_{i,j}^{n} + T_{i,j-1}^{n}\right)
 +
-\frac{r_y}{2}
-\left[
-(T_{i,j+1}^{n} - 2T_{i,j}^{n} + T_{i,j-1}^{n})
-+
-(T_{i,j+1}^{n+1} - 2T_{i,j}^{n+1} + T_{i,j-1}^{n+1})
+\left(T_{i,j+1}^{n+1} - 2T_{i,j}^{n+1} + T_{i,j-1}^{n+1}\right)
 \right]
 $$
+
 
 Matrix form:
 
