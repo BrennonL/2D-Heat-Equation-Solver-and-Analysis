@@ -1,5 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from explicit_methods import (
+  analytical_solution
+)
+from constants import ALPHA
 
 def exact_solution(X, Y, t, alpha, Lx, Ly):
     return (

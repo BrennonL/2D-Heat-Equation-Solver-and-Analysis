@@ -181,6 +181,9 @@ print_selected_values(x, y, T_num, T_exact)
 
 # Plot results
 plot_heatmap(X, Y, T_num, "FTCS Numerical Solution")
+plt.savefig("FTCS-Numerical-Solution.png")
 plot_heatmap(X, Y, T_exact, "Analytical Solution")
 #plot_heatmap(X, Y, np.abs(error), "Absolute Error")
+plt.savefig("Analytical-Solution.png")
 plt.show()
+plt.clf()
