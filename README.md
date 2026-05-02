@@ -42,16 +42,13 @@ The project includes:
 The FTCS (Forward-Time Central-Space) scheme is given by:
 
 $$
-T_{i,j}^{n+1} = T_{i,j}^{n}
-+ r_x \left(T_{i+1,j}^{n} - 2T_{i,j}^{n} + T_{i-1,j}^{n}\right)
-+ r_y \left(T_{i,j+1}^{n} - 2T_{i,j}^{n} + T_{i,j-1}^{n}\right)
+T_{i,j}^{n+1} = T_{i,j}^{n} + r_x \left(T_{i+1,j}^{n} - 2T_{i,j}^{n} + T_{i-1,j}^{n}\right) + r_y \left(T_{i,j+1}^{n} - 2T_{i,j}^{n} + T_{i,j-1}^{n}\right)
 $$
 
 where:
 
 $$
-r_x = \frac{\alpha \Delta t}{\Delta x^2}, \qquad
-r_y = \frac{\alpha \Delta t}{\Delta y^2}
+r_x = \frac{\alpha \Delta t}{\Delta x^2}, \qquad r_y = \frac{\alpha \Delta t}{\Delta y^2}
 $$
 
 **Stability condition:**
@@ -67,18 +64,14 @@ $$
 The Backward Euler method uses a fully implicit time discretization:
 
 $$
-T_{i,j}^{n+1} = T_{i,j}^{n}
-+ r_x \left(T_{i+1,j}^{n+1} - 2T_{i,j}^{n+1} + T_{i-1,j}^{n+1}\right)
-+ r_y \left(T_{i,j+1}^{n+1} - 2T_{i,j}^{n+1} + T_{i,j-1}^{n+1}\right)
+T_{i,j}^{n+1} = T_{i,j}^{n} + r_x \left(T_{i+1,j}^{n+1} - 2T_{i,j}^{n+1} + T_{i-1,j}^{n+1}\right) + r_y \left(T_{i,j+1}^{n+1} - 2T_{i,j}^{n+1} + T_{i,j-1}^{n+1}\right)
 $$
 
-This can be written in matrix form as:
+Matrix form:
 
 $$
 A \mathbf{T}^{n+1} = \mathbf{T}^n + \mathbf{b}
 $$
-
-where \(A\) is a coefficient matrix and \(\mathbf{b}\) contains boundary contributions.
 
 **Property:**
 - Unconditionally stable
@@ -90,22 +83,8 @@ where \(A\) is a coefficient matrix and \(\mathbf{b}\) contains boundary contrib
 The Crank–Nicolson method averages FTCS and Backward Euler:
 
 $$
-T_{i,j}^{n+1} = T_{i,j}^{n}
-+ \frac{r_x}{2}\left[
-\left(T_{i+1,j}^{n} - 2T_{i,j}^{n} + T_{i-1,j}^{n}\right)
-+
-\left(T_{i+1,j}^{n+1} - 2T_{i,j}^{n+1} + T_{i-1,j}^{n+1}\right)
-\right]
+T_{i,j}^{n+1} = T_{i,j}^{n} + \frac{r_x}{2} \left[ (T_{i+1,j}^{n} - 2T_{i,j}^{n} + T_{i-1,j}^{n}) + (T_{i+1,j}^{n+1} - 2T_{i,j}^{n+1} + T_{i-1,j}^{n+1}) \right] + \frac{r_y}{2} \left[ (T_{i,j+1}^{n} - 2T_{i,j}^{n} + T_{i,j-1}^{n}) + (T_{i,j+1}^{n+1} - 2T_{i,j}^{n+1} + T_{i,j-1}^{n+1}) \right]
 $$
-
-$$
-+ \frac{r_y}{2}\left[
-\left(T_{i,j+1}^{n} - 2T_{i,j}^{n} + T_{i,j-1}^{n}\right)
-+
-\left(T_{i,j+1}^{n+1} - 2T_{i,j}^{n+1} + T_{i,j-1}^{n+1}\right)
-\right]
-$$
-
 
 Matrix form:
 
@@ -116,7 +95,6 @@ $$
 **Properties:**
 - Unconditionally stable  
 - Second-order accurate in time  
-
 ---
 
 ## 🧪 Verification
