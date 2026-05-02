@@ -54,7 +54,6 @@ def main():
   T = T[1:-1, 1:-1]
   T_flat = T.flatten(order="F")
   b_euler = backward_Euler(dx,dt,t_final,ALPHA,T_flat, (0,Lx,0,Ly),(0,0,0,0))
-  print(b_euler)
   plt.clf()
   plt.imshow(b_euler, origin='lower', cmap='hot')
   plt.colorbar(label="Temperature")
