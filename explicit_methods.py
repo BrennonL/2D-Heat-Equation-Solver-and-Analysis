@@ -94,14 +94,15 @@ def compute_errors(T_num, T_exact):
     return L2_error, max_error, error
 
 # Plot temperature distribution as a heatmap
-def plot_heatmap(X, Y, T, title):
+def plot_heatmap(X, Y, T, title, filename, vmin=0, vmax=None):
     plt.figure(figsize=(6, 5))
-    plt.contourf(X, Y, T, levels=30, cmap="hot")
+    plt.contourf(X, Y, T, levels=30, cmap="hot", vmin=vmin, vmax=vmax)
     plt.colorbar(label="Temperature")
     plt.xlabel("x")
     plt.ylabel("y")
     plt.title(title)
     plt.tight_layout()
+    plt.savefig(filename, dpi=300)
 
 
 # Print numerical vs exact values at selected points
@@ -180,10 +181,12 @@ print(f"Maximum error = {max_error:.8e}")
 print_selected_values(x, y, T_num, T_exact)
 
 # Plot results
-plot_heatmap(X, Y, T_num, "FTCS Numerical Solution")
-plt.savefig("FTCS-Numerical-Solution.png")
-plot_heatmap(X, Y, T_exact, "Analytical Solution")
+
+vmin = 0
+vmax = 55
+
+plot_heatmap(X, Y, T_num, "FTCS Numerical Solution", "FTCS-Numerical-Solution.png", vmin, vmax)
+plot_heatmap(X, Y, T_exact, "Analytical Solution", "Analytical-Solution.png", vmin, vmax)
 #plot_heatmap(X, Y, np.abs(error), "Absolute Error")
-plt.savefig("Analytical-Solution.png")
 plt.show()
 plt.clf()

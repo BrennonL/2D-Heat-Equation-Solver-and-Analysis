@@ -10,13 +10,6 @@ from implicit_methods import (
 )
 from constants import ALPHA
 
-def exact_solution(X, Y, t, alpha, Lx, Ly):
-    return (
-        np.sin(np.pi * X / Lx)
-        * np.sin(np.pi * Y / Ly)
-        * np.exp(-alpha * np.pi**2 * (1 / Lx**2 + 1 / Ly**2) * t)
-    )
-
 def main():
   Lx = 1.0
   Ly = 1.0
@@ -26,6 +19,8 @@ def main():
   dt = 1e-5
   t_final = 0.01
   T0 = 100 # maximum initial temperature at the center of the plate
+
+  # Run FTCS solver
   x, y, X, Y, T_num, dx, dy, rx, ry = ftcs_2d_heat(
       Lx=Lx,
       Ly=Ly,
@@ -36,6 +31,7 @@ def main():
       t_final=t_final,
       T0=T0
   )
+  
   # Compute analytical solution
   T_exact = analytical_solution(X, Y, t_final, alpha, Lx, Ly, T0)
 
@@ -45,6 +41,7 @@ def main():
   x = np.linspace(0, Lx, nx)
   y = np.linspace(0, Ly, ny)
   X, Y = np.meshgrid(x, y)
+
   # Stability parameters
   rx = alpha * dt / dx**2
   ry = alpha * dt / dy**2
@@ -53,16 +50,39 @@ def main():
   T = T0 * np.sin(np.pi * X / Lx) * np.sin(np.pi * Y / Ly)
   T = T[1:-1, 1:-1]
   T_flat = T.flatten(order="F")
-  b_euler = backward_Euler(dx,dt,t_final,ALPHA,T_flat, (0,Lx,0,Ly),(0,0,0,0))
-  plt.clf()
-  plt.imshow(b_euler, origin='lower', cmap='hot')
+
+  # Run Backward Euler
+  b_euler = backward_Euler(
+      dx,
+      1e-5,
+      t_final,
+      alpha,
+      T_flat,
+      (0, Lx, 0, Ly),
+      (0, 0, 0, 0)
+  )
+
+  # Put interior solution back into full grid with zero boundaries
+  T_be_full = np.zeros((ny, nx))
+  T_be_full[1:-1, 1:-1] = b_euler
+
+  # Compare max temperature between methods
+  print("FTCS max:", np.max(T_num))
+  print("Backward Euler max:", np.max(T_be_full))
+  print("Exact max:", np.max(T_exact))
+
+  # Plot Backward Euler using contour map
+  vmin = 0
+  vmax = 55
+  plt.figure(figsize=(6, 5))
+  plt.contourf(X, Y, T_be_full, levels=30, cmap="hot", vmin=vmin, vmax=vmax)
   plt.colorbar(label="Temperature")
-  plt.title("Heatmap")
   plt.xlabel("x")
   plt.ylabel("y")
-  plt.savefig("backward-euler.png")
-  plt.clf()
-
+  plt.title("Backward Euler Numerical Solution")
+  plt.tight_layout()
+  plt.savefig("Backward-Euler-Solution.png")
+  plt.show()
 
 
 if __name__ == "__main__":
