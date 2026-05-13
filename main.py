@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from explicit_methods import (
   analytical_solution,
+  compute_errors,
   ftcs_2d_heat
 )
 from implicit_methods import (
@@ -117,6 +118,70 @@ def main():
   plt.savefig("Crank-Nicolson-Solution.png")
   # plt.show()
 
+ # Convergence study: L2 error vs h
+  grid_sizes = [21, 41, 81, 161]
 
+  h_values = []
+  l2_errors = []
+
+  for n in grid_sizes:
+      nx_conv = n
+      ny_conv = n
+
+      dx_conv = Lx / (nx_conv - 1)
+
+      # Choose stable dt and make sure t_final is reached exactly
+      dt_guess = 0.1 * dx_conv**2 / alpha
+      n_steps_conv = int(np.ceil(t_final / dt_guess))
+      dt_conv = t_final / n_steps_conv
+
+      x_conv, y_conv, X_conv, Y_conv, T_conv, dx_conv, dy_conv, rx_conv, ry_conv = ftcs_2d_heat(
+          Lx=Lx,
+          Ly=Ly,
+          nx=nx_conv,
+          ny=ny_conv,
+          alpha=alpha,
+          dt=dt_conv,
+          t_final=t_final,
+          T0=T0
+      )
+
+      T_exact_conv = analytical_solution(
+          X_conv,
+          Y_conv,
+          t_final,
+          alpha,
+          Lx,
+          Ly,
+          T0
+      )
+
+      L2_conv, max_conv, error_conv = compute_errors(T_conv, T_exact_conv)
+
+      h_values.append(dx_conv)
+      l2_errors.append(L2_conv)
+
+      print(f"Grid size = {nx_conv} x {ny_conv}")
+      print(f"h = {dx_conv:.6e}")
+      print(f"dt = {dt_conv:.6e}")
+      print(f"L2 error = {L2_conv:.8e}")
+      print("-" * 40)
+
+  h_values = np.array(h_values)
+  l2_errors = np.array(l2_errors)
+
+  sort_idx = np.argsort(h_values)
+  h_values = h_values[sort_idx]
+  l2_errors = l2_errors[sort_idx]
+
+  plt.figure(figsize=(6, 5))
+  plt.loglog(h_values, l2_errors, marker="o")
+  plt.xlabel("h")
+  plt.ylabel("L2 Error")
+  plt.title("Convergence Study: L2 Error vs h")
+  plt.grid(True, which="both")
+  plt.tight_layout()
+  plt.savefig("L2-Convergence-Study.png")
+  
 if __name__ == "__main__":
   main()
