@@ -1,4 +1,5 @@
 import numpy as np
+import time
 import matplotlib.pyplot as plt
 from explicit_methods import (
   analytical_solution,
@@ -22,6 +23,7 @@ def main():
   T0 = 100 # maximum initial temperature at the center of the plate
 
   # Run FTCS solver
+  start_time = time.perf_counter()
   x, y, X, Y, T_num, dx, dy, rx, ry = ftcs_2d_heat(
       Lx=Lx,
       Ly=Ly,
@@ -32,6 +34,7 @@ def main():
       t_final=t_final,
       T0=T0
   )
+  ftcs_time = time.perf_counter() - start_time
   
   # Compute analytical solution
   T_exact = analytical_solution(X, Y, t_final, alpha, Lx, Ly, T0)
@@ -53,6 +56,7 @@ def main():
   T_flat = T.flatten(order="F")
 
   # Run Backward Euler
+  start_time = time.perf_counter()
   b_euler = backward_Euler(
       dx,
       1e-5,
@@ -62,6 +66,7 @@ def main():
       (0, Lx, 0, Ly),
       (0, 0, 0, 0)
   )
+  backward_euler_time = time.perf_counter() - start_time
 
   # Put interior solution back into full grid with zero boundaries
   T_be_full = np.zeros((ny, nx))
@@ -86,6 +91,7 @@ def main():
   # plt.show()
 
   # Run Crank Nicolson
+  start_time = time.perf_counter()
   cn = crank_nicolson(
       dx,
       1e-5,
@@ -95,6 +101,7 @@ def main():
       (0, Lx, 0, Ly),
       (0, 0, 0, 0)
   )
+  crank_nicolson_time = time.perf_counter() - start_time
 
   # Put interior solution back into full grid with zero boundaries
   T_cn_full = np.zeros((ny, nx))
@@ -117,6 +124,12 @@ def main():
   plt.tight_layout()
   plt.savefig("Crank-Nicolson-Solution.png")
   # plt.show()
+  print("Execution Time Summary")
+  print("-" * 40)
+  print(f"FTCS execution time: {ftcs_time:.6e} seconds")
+  print(f"Backward Euler execution time: {backward_euler_time:.6e} seconds")
+  print(f"Crank Nicolson execution time: {crank_nicolson_time:.6e} seconds")
+  print("-" * 40)
 
  # Convergence study: L2 error vs h
   grid_sizes = [21, 41, 81, 161]
