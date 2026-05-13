@@ -85,7 +85,7 @@ def main():
   # plt.show()
 
   # Run Crank Nicolson
-  b_euler = backward_Euler(
+  cn = crank_nicolson(
       dx,
       1e-5,
       t_final,
@@ -96,19 +96,19 @@ def main():
   )
 
   # Put interior solution back into full grid with zero boundaries
-  T_be_full = np.zeros((ny, nx))
-  T_be_full[1:-1, 1:-1] = b_euler
+  T_cn_full = np.zeros((ny, nx))
+  T_cn_full[1:-1, 1:-1] = cn
 
   # Compare max temperature between methods
   print("FTCS max:", np.max(T_num))
-  print("Backward Euler max:", np.max(T_be_full))
+  print("Crank Nicolson max:", np.max(T_cn_full))
   print("Exact max:", np.max(T_exact))
 
-  # Plot Backward Euler using contour map
+  # Plot Crank Nicolson using contour map
   vmin = 0
   vmax = 55
   plt.figure(figsize=(6, 5))
-  plt.contourf(X, Y, T_be_full, levels=30, cmap="hot", vmin=vmin, vmax=vmax)
+  plt.contourf(X, Y, T_cn_full, levels=30, cmap="hot", vmin=vmin, vmax=vmax)
   plt.colorbar(label="Temperature")
   plt.xlabel("x")
   plt.ylabel("y")
