@@ -147,3 +147,7 @@ def crank_nicolson(
     curr_x = next_x
   curr_x = reshape(curr_x,(nx,ny))
   return curr_x
+
+
+def plot_implicit():
+  ...
