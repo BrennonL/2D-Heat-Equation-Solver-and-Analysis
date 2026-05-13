@@ -82,7 +82,40 @@ def main():
   plt.title("Backward Euler Numerical Solution")
   plt.tight_layout()
   plt.savefig("Backward-Euler-Solution.png")
-  plt.show()
+  # plt.show()
+
+  # Run Crank Nicolson
+  b_euler = backward_Euler(
+      dx,
+      1e-5,
+      t_final,
+      alpha,
+      T_flat,
+      (0, Lx, 0, Ly),
+      (0, 0, 0, 0)
+  )
+
+  # Put interior solution back into full grid with zero boundaries
+  T_be_full = np.zeros((ny, nx))
+  T_be_full[1:-1, 1:-1] = b_euler
+
+  # Compare max temperature between methods
+  print("FTCS max:", np.max(T_num))
+  print("Backward Euler max:", np.max(T_be_full))
+  print("Exact max:", np.max(T_exact))
+
+  # Plot Backward Euler using contour map
+  vmin = 0
+  vmax = 55
+  plt.figure(figsize=(6, 5))
+  plt.contourf(X, Y, T_be_full, levels=30, cmap="hot", vmin=vmin, vmax=vmax)
+  plt.colorbar(label="Temperature")
+  plt.xlabel("x")
+  plt.ylabel("y")
+  plt.title("Crank Nicolson Numerical Solution")
+  plt.tight_layout()
+  plt.savefig("Crank-Nicolson-Solution.png")
+  # plt.show()
 
 
 if __name__ == "__main__":

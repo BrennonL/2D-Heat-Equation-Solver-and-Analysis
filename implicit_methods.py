@@ -105,30 +105,45 @@ def crank_nicolson(
   # initial_x[int(len(initial_x)/2)] = 100
   # Create sparce matrix or coefficient matrix
   A:ndarray = zeros((int(N),int(N)))
+  B:ndarray = zeros((int(N),int(N)))
   b:ndarray = zeros(int(N))
-  fill_diagonal(A, (1 + 2*Lambda))
-  for i in range(len(A)): # rows
-    for j in range(len(A[i])): # columns
-      if A[i][j] == 1 + 2*Lambda:
-        if j>0: # Left
-          A[i][j-1] = - Lambda
-          b[i] += Tl
-        if j<(len(A[i]) - 1): # right
-          A[i][j+1] = - Lambda
-          b[i] += Tr
-        if j-nx>0: # bottom
-          A[i][j-nx] = - Lambda
-          b[i] += Tb
-        if j+nx<(len(A[i])-1): # top
-          A[i][j+nx] = - Lambda
-          b[i] += Tt
+  for k in range(N):
+    A[k,k] = 2*(1 + 2*Lambda)
+    B[k,k] = 2*(1 - 2*Lambda)
+
+    i:int = (k) % nx + 1
+    j:int = (k) // nx + 1
+
+    if i > 1: # Left
+      A[k, k-1] = - Lambda
+      B[k, k-1] = Lambda
+    else:
+      b[k] += Lambda*Tl
+
+    if i < nx: # Right
+      A[k, k+1] = - Lambda
+      B[k, k+1] = Lambda
+    else:
+      b[k] += Lambda*Tr
+
+    if j < ny: # Top
+      A[k, k+nx] = - Lambda
+      B[k, k+nx] = Lambda
+    else:
+      b[k-1] += Lambda*Tt
+
+    if j > 1: # Bottom
+      A[k, k-nx] = - Lambda
+      B[k, k-nx] = Lambda
+    else:
+      b[k] += Lambda*Tb
 
   # Run simulation
   n = t / delta_t # Number of time steps
   curr_x = initial_x
   for k in range(int(n)):
-    b_new = curr_x + b
-    next_x = solve(A, b)
+    b_new = B@curr_x + b
+    next_x = solve(A, b_new)
     curr_x = next_x
   curr_x = reshape(curr_x,(nx,ny))
   return curr_x
